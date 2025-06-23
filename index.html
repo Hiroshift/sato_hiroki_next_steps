@@ -222,7 +222,17 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         createChart() {
             const ctx = document.getElementById('electionResultsChart').getContext('2d');
-            const labels = electionData.map(d => `${d.name}（${d.votes.toLocaleString()}票）`);
+            // ラベルを2行表示（[名前, 得票数]の配列）
+            const labels = electionData.map(d => [d.name, `${d.votes.toLocaleString()}票`]);
+            // スマホ対応: canvas高さをウィンドウ幅で可変に
+            const chartCanvas = document.getElementById('electionResultsChart');
+            if (window.innerWidth < 640) {
+                chartCanvas.height = 520;
+            } else {
+                chartCanvas.height = 400;
+            }
+            // スマホ対応: y軸フォントサイズも可変
+            const yFontSize = window.innerWidth < 640 ? 12 : 16;
             const backgroundColors = electionData.map(d => d.name.includes('佐藤') ? '#FBBF24' : '#4b5563');
             const borderColors = electionData.map(d => d.name.includes('佐藤') ? '#FBBF24' : '#6b7280');
             const borderWidths = electionData.map(d => d.name.includes('佐藤') ? 6 : 1);
@@ -272,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         y: {
                             grid: { display: false },
-                            ticks: { color: '#fff', font: { weight: 'bold', size: 16 } }
+                            ticks: { color: '#fff', font: { weight: 'bold', size: yFontSize }, callback: function(value) { return this.getLabelForValue(value); } }
                         }
                     }
                 }
